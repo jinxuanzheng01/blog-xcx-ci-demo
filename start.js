@@ -44,11 +44,11 @@ const project = new ci.Project({
 });
 
 /** 上传 */
-async function upload({version = '0.0.0', desc ='test'}) {
+async function upload({version = '0.0.0', versionDesc ='test'}) {
     await ci.upload({
         project,
         version,
-        desc,
+        desc: versionDesc,
         setting: {
             es7: true,
             minify: true,
