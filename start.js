@@ -44,21 +44,21 @@ const project = new ci.Project({
 });
 
 /** 上传 */
-// async function upload({version = '0.0.0', desc ='test'}) {
-//     await ci.upload({
-//         project,
-//         version,
-//         desc,
-//         setting: {
-//             es7: true,
-//             minify: true,
-//             autoPrefixWXSS: true
-//         },
-//         onProgressUpdate: console.log,
-//       })
-// }
+async function upload({version = '0.0.0', desc ='test'}) {
+    await ci.upload({
+        project,
+        version,
+        desc,
+        setting: {
+            es7: true,
+            minify: true,
+            autoPrefixWXSS: true
+        },
+        onProgressUpdate: console.log,
+      })
+}
 
-// upload({version: '1.2.3', desc: '2222'}) 
+
 
 function inquirerResult({version, versionDesc} = {}) {
     return inquirer.prompt([
@@ -91,7 +91,11 @@ function inquirerResult({version, versionDesc} = {}) {
 
 /** 入口函数 */
 async function init() {
+    // 获取更改信息
     let versionData = await inquirerResult(versionConfig);
+    // 上传
+    await upload(versionData);
+    // 修改本地版本文件
     fs.writeFileSync('./version.config.json', JSON.stringify(versionData), err => {
         if(err) {
             console.log('自动写入app.json文件失败，请手动填写，并检查错误');
