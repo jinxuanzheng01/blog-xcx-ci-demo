@@ -1,5 +1,6 @@
 const ci = require('miniprogram-ci');
 const fs = require('fs');
+const inquirer = require('inquirer');
 
 /* 项目配置 */
 const projectConfig = require('./project.config.json');
@@ -59,12 +60,43 @@ async function upload({version = '0.0.0', versionDesc ='test'}) {
 
 
 
+function inquirerResult({version, versionDesc} = {}) {
+    return inquirer.prompt([
+        // 设置版本号
+        {
+          type: 'list',
+          name: 'version',
+          message: `设置上传的版本号(当前版本号: ${version}):`,
+          default: 1,
+          choices: getVersionChoices(version),
+          filter(opts) {
+                if (opts === 'no change') {
+                    return version;
+                }
+                return opts.split(': ')[1];
+            }
+      },
+  
+      // 设置上传描述
+      {
+          type: 'input',
+          name: 'versionDesc',
+          message: `写一个简单的介绍来描述这个版本的改动过:`,
+      },
+  ]);
+}
+
+
+
+
 /** 入口函数 */
 async function init() {
+    // 获取更改信息
+    let versionData = await inquirerResult(versionConfig);
     // 上传
-    await upload(versionConfig);
+    await upload(versionData);
     // 修改本地版本文件
-    fs.writeFileSync('./version.config.json', JSON.stringify(versionConfig), err => {
+    fs.writeFileSync('./version.config.json', JSON.stringify(versionData), err => {
         if(err) {
             console.log('自动写入app.json文件失败，请手动填写，并检查错误');
         }
